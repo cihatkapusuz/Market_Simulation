@@ -1,0 +1,150 @@
+#lang scheme
+;2016400126
+
+(define (COST-OF-CROP cr1 f1)
+  (COST-OF-CROPP cr1 f1 CROPS))
+(define (COST-OF-CROPP cr1 f1 l1)
+  (if(null? l1) 0
+     (if(eq? cr1 (car(car l1))) (if(eq? f1 (car(cdr(car l1)))) (car(cdr(cdr(car l1))))
+                                  (COST-OF-CROPP cr1 f1 (cdr l1)))
+        (COST-OF-CROPP cr1 f1 (cdr l1)))))
+(define (mem elem lis)
+  (cond
+    ((null? lis) #f)
+    ((eq? elem (car lis)) #t)
+    (else (mem elem (cdr lis)))))
+
+(define (minum l1)
+  (if (null? l1) 0
+  (if (eq? (length l1) 1) (car l1)
+      (min (car l1)(minum (cdr l1))))))
+
+(define (maxum l1)
+  (if (null? l1) 0
+  (if (eq? (length l1) 1) (car l1)
+      (max (car l1)(maxum (cdr l1))))))
+
+(define (TRANSPORTATION-COST f1)
+  (if (null? FARMS) 0
+  ( if (eqv? (car(car FARMS)) f1)
+       (car(cdr(car FARMS)))
+       (TRANSPORTATION-COSTT f1 (cdr FARMS)))))
+
+(define (TRANSPORTATION-COSTT f2 l2)
+  ( cond
+     ((eqv? (length l2) 0) 0)
+     ((eqv? (car(car l2)) f2) (car(cdr(car l2))))
+     ((> (length l2) 0) (TRANSPORTATION-COSTT f2 (cdr l2)))))
+
+
+(define (AVAILABLE-CROPS f1)
+   (if (null? FARMS) '()
+( if (eqv? (car(car FARMS)) f1) (car(cdr(cdr(car FARMS))))
+(AVAILABLE-CROPSS f1 (cdr FARMS))))) 
+
+(define (AVAILABLE-CROPSS f2 l2)
+( cond
+   ((eqv? (length l2) 0) '())
+   ((eqv? (car(car l2)) f2) (car(cdr(cdr(car l2)))))
+   ((> (length l2) 0) ( AVAILABLE-CROPSS f2 (cdr l2)))
+   ))
+
+(define (INTERESTED-CROPS c1)
+   (if (null? CUSTOMERS) '()
+( if (eqv? (car(car CUSTOMERS)) c1) (car(cdr(cdr(car CUSTOMERS))))
+(INTERESTED-CROPSS c1 (cdr CUSTOMERS)))))
+
+(define (INTERESTED-CROPSS c2 l2)
+( cond
+   ((eqv? (length l2) 0) '())
+   ((eqv? (car(car l2)) c2) (car(cdr(cdr(car l2)))))
+   ((> (length l2) 0) ( INTERESTED-CROPSS c2 (cdr l2)))
+   ))
+
+
+(define (CONTRACT-FARMS c1)
+  (if (null? CUSTOMERS) '()
+( if (eqv? (car(car CUSTOMERS)) c1) (car(cdr(car CUSTOMERS)))
+(CONTRACT-FARMSS c1 (cdr CUSTOMERS)))))
+(define (CONTRACT-FARMSS c2 l2)
+( cond
+   ((eqv? (length l2) 0) '())
+   ((eqv? (car(car l2)) c2) (car(cdr(car l2))))
+   ((> (length l2) 0) (CONTRACT-FARMSS c2 (cdr l2)))
+   ))
+
+
+
+(define (CONTRACT-WITH-FARM f1)
+  (CONTRACT-WITH-FARMM f1 CUSTOMERS '()))
+(define (CONTRACT-WITH-FARMM f1 l1 l2)
+  (if(null? l1) (reverse l2)
+     (if
+       (mem f1 (car(cdr(car l1)))) (CONTRACT-WITH-FARMM f1 (cdr l1) (cons(car(car l1)) l2))
+       (CONTRACT-WITH-FARMM f1 (cdr l1) l2))))
+
+(define (INTERESTED-IN-CROP f1)
+  (INTERESTED-IN-CROPP f1 CUSTOMERS '()))
+(define (INTERESTED-IN-CROPP f1 l1 l2)
+  (if(null? l1) (reverse l2)
+     (if
+       (mem f1 (car(cdr(cdr(car l1))))) (INTERESTED-IN-CROPP f1 (cdr l1) (cons(car(car l1)) l2))
+       (INTERESTED-IN-CROPP f1 (cdr l1) l2))))
+
+(define (MIN-SALE-PRICE cr1)
+  (if(null? CROPS) 0
+     (MIN-SALE-PRICEE cr1 CROPS '())))
+(define (MIN-SALE-PRICEE cr2 l1 l2)
+  (if(null? l1) (minum l2)
+  (if(eq? (car(car l1)) cr2) (MIN-SALE-PRICEE cr2 (cdr l1) (cons(car(cdr(cdr(car l1))))l2))
+     (MIN-SALE-PRICEE cr2 (cdr l1) l2))))
+
+(define (MAX-SALE-PRICE cr1)
+  (if(null? CROPS) 0
+     (MAX-SALE-PRICEE cr1 CROPS '())))
+(define (MAX-SALE-PRICEE cr2 l1 l2)
+  (if(null? l1) (maxum l2)
+  (if(eq? (car(car l1)) cr2) (MAX-SALE-PRICEE cr2 (cdr l1) (cons(car(cdr(cdr(car l1))))l2))
+     (MAX-SALE-PRICEE cr2 (cdr l1) l2))))
+
+(define (CROPS-BETWEEN mi ma)
+  (CROPS-BETWEENN mi ma CROPS '()))
+(define (CROPS-BETWEENN mi ma l1 l2)
+  (if(null? l1) (reverse l2)
+     (if (> mi (MAX-SALE-PRICE (car(car l1)))) (CROPS-BETWEENN mi ma (cdr l1) l2)
+         (if (< ma (MIN-SALE-PRICE (car(car l1)))) (CROPS-BETWEENN mi ma (cdr l1) l2)
+          (if(mem (car(car l1)) l2) (CROPS-BETWEENN mi ma (cdr l1) l2)
+              (CROPS-BETWEENN mi ma (cdr l1) (cons (car(car l1)) l2)))
+          )
+     )
+  )
+)
+
+(define (FIND-FROM-FARM l1 el l2)
+  (if (null? l1) (minum l2)
+      (if (eq? 0 (COST-OF-CROP el (car l1) )) (FIND-FROM-FARM (cdr l1) el l2)
+          (FIND-FROM-FARM (cdr l1) el (cons (+ (TRANSPORTATION-COST (car l1)) (COST-OF-CROP el (car l1))) l2)))))
+
+(define (FIND-PRICES cr1 l1 l2)
+  (if (null? l2) 0
+  (if(eq? cr1 (car l2)) (FIND-FROM-FARM l1 (car l2) '())
+     (FIND-PRICES cr1 l1 (cdr l2)))))
+                          
+(define (BUY-PRICE c1 cr1)
+  (BUY-PRICEE c1 cr1 CUSTOMERS ))
+(define (BUY-PRICEE c1 cr1 lc3)
+  (if(null? lc3) 0
+(if(eq? c1 (car(car lc3))) (FIND-PRICES cr1 (car(cdr(car lc3))) (car(cdr(cdr(car lc3)))))
+     (BUY-PRICEE c1 cr1 (cdr lc3)))))
+
+
+(define (TOTAL-COST c1 l1 su)
+  (if (null? l1) su
+      (TOTAL-COST c1 (cdr l1) (+ (BUY-PRICE c1 (car l1)) su))))
+ 
+(define (TOTAL-PRICE c1)
+  (TOTAL-PRICEE c1 CUSTOMERS))
+(define (TOTAL-PRICEE c1 l1)
+  (if(null? l1) 0
+  (if(eq? c1 (car(car l1))) (TOTAL-COST c1 (car(cdr(cdr(car l1)))) 0)
+     (TOTAL-PRICEE c1 (cdr l1)))))
